@@ -267,7 +267,17 @@ async function run() {
       const result = await cartCollection.find(query).toArray();
       res.send(result);
     });
+    app.delete('/carts/:email', async (req, res) => {
+      try {
+        const email = req.params.email;
+        
 
+        const result = await cartCollection.deleteMany({email: email})
+        res.send(result)
+      } catch (err) {
+        res.send(err.message)
+      }
+    })
 
     app.delete("/delete/:id", async (req, res) => {
       try {
