@@ -247,14 +247,7 @@ async function run() {
     //   if (!email) {
     //     res.send()
     //   }
-    //   const decodedEmail = req.decoded.email;
-    //   if(email!== decodedEmail){
-    //     res.status(403).send({ error: true, message: 'forbidden access' })
-    //   }
-    //   const query = { email: email }
-    //   const result = await cartCollection.find(query).toArray()
-    //   res.send(result)
-    // })
+       
 
     // carts collection
     app.get('/carts', async (req, res) => {
@@ -263,6 +256,7 @@ async function run() {
       if (!email) {
         return res.status(401).send({ message: 'unauthorized access' });
       }
+      
       const query = { email: email };
       const result = await cartCollection.find(query).toArray();
       res.send(result);
@@ -333,7 +327,7 @@ async function run() {
       const deleteResult = await cartCollection.deleteMany(query)
       res.send({paymentResult, deleteResult})
     })
-    app.get("/payments", async(req, res)=>{
+    app.get("/payments", verifyJwt, async(req, res)=>{
       const result = await paymentCollection.find().toArray();
       res.send(result)
     })
