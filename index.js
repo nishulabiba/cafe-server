@@ -251,6 +251,7 @@ async function run() {
 
     app.get('/reservations', verifyJwt, async (req, res) => {
       const email = req.query.email;
+      console.log(email);
       if (!email) {
         return res.status(401).send({ message: 'unauthorized access' });
       }
@@ -258,7 +259,21 @@ async function run() {
       const result = await reservationCollection.find(query).toArray();
       res.send(result);
     })
-       
+    app.delete("/deleteBooking/:id", verifyJwt, async (req, res) => {
+      try {
+        const email = req.query.email;
+        if (!email) {
+          return res.status(401).send({ message: 'unauthorized access' });
+        }
+        const id = req.params.id;
+        const filter = { _id: new ObjectId(id) }
+
+        const result = await reservationCollection.deleteOne(filter)
+        res.send(result)
+      } catch (err) {
+        res.send(err.message)
+      }
+    })  
 
     // carts collection
     app.get('/carts', async (req, res) => {
