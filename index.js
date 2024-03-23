@@ -61,6 +61,7 @@ async function run() {
     const reviewsCollection = client.db("cafedb").collection("reviews");
     const cartCollection = client.db("cafedb").collection("carts");
     const paymentCollection = client.db("cafedb").collection("payments");
+    const reservationCollection = client.db("cafedb").collection("reservations");
     
 
     //JWT GENERATION...
@@ -142,7 +143,7 @@ async function run() {
     )
     //get user's role
 
-    app.get("/users/admin/:email", async (req, res) => {
+    app.get("/users/admin/:email",verifyJwt, verifyAdmin, async (req, res) => {
       const email = req.params.email;
       // //security 1st layer : check jwt token
       // console.log(req.decoded.email);
@@ -234,19 +235,29 @@ async function run() {
     })
     // cart posted
 
-    app.post("/carts", async (req, res) => {
+    app.post("/carts", verifyJwt, async (req, res) => {
 
       const item = req.body;
       const result = await cartCollection.insertOne(item);
       res.send(result)
     })
-    // carts collection
+    // reservations collection
+    app.post("/reservations", verifyJwt, async (req, res) => {
 
-    // app.get('/carts', verifyJwt, async (req, res) => {
-    //   const email = req.query.email;
-    //   if (!email) {
-    //     res.send()
-    //   }
+      const item = req.body;
+      const result = await reservationCollection.insertOne(item);
+      res.send(result)
+    })
+
+    app.get('/reservations', verifyJwt, async (req, res) => {
+      const email = req.query.email;
+      if (!email) {
+        return res.status(401).send({ message: 'unauthorized access' });
+      }
+      const query = { email: email };
+      const result = await reservationCollection.find(query).toArray();
+      res.send(result);
+    })
        
 
     // carts collection
