@@ -259,7 +259,7 @@ async function run() {
       const result = await reservationCollection.find(query).toArray();
       res.send(result);
     })
-    app.delete("/deleteBooking/:id", verifyJwt, async (req, res) => {
+    app.delete("/delete/booking/:id", async (req, res) => {
       try {
        
         const id = req.params.id;
