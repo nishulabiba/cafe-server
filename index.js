@@ -235,7 +235,7 @@ async function run() {
     })
     // cart posted
 
-    app.post("/carts", verifyJwt, async (req, res) => {
+    app.post("/carts", async (req, res) => {
 
       const item = req.body;
       const result = await cartCollection.insertOne(item);
@@ -261,10 +261,7 @@ async function run() {
     })
     app.delete("/deleteBooking/:id", verifyJwt, async (req, res) => {
       try {
-        const email = req.query.email;
-        if (!email) {
-          return res.status(401).send({ message: 'unauthorized access' });
-        }
+       
         const id = req.params.id;
         const filter = { _id: new ObjectId(id) }
 
@@ -276,7 +273,7 @@ async function run() {
     })  
 
     // carts collection
-    app.get('/carts', async (req, res) => {
+    app.get('/carts',verifyJwt, async (req, res) => {
 
       const email = req.query.email;
       if (!email) {
