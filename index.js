@@ -107,7 +107,7 @@ async function run() {
       }
     })
 
-    app.get("/users", verifyAdmin, async (req, res) => {
+    app.get("/users",verifyJwt, verifyAdmin, async (req, res) => {
       // console.log(req.headers);
       // const email = req.query.email;
       // //security level: check logged user.
@@ -159,7 +159,7 @@ async function run() {
       res.send(result.admin);
     })
     //delete admin role
-    app.patch("/delete/admin/:id", verifyAdmin, async (req, res) => {
+    app.patch("/delete/admin/:id",verifyJwt, verifyAdmin, async (req, res) => {
       const id = req.params.id;
       const filter = { _id: new ObjectId(id) };
       const updateDoc = {
