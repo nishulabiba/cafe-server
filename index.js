@@ -143,7 +143,7 @@ async function run() {
     )
     //get user's role
 
-    app.get("/users/admin/:email",verifyJwt, verifyAdmin, async (req, res) => {
+    app.get("/users/admin/:email",verifyJwt, async (req, res) => {
       const email = req.params.email;
       // //security 1st layer : check jwt token
       // console.log(req.decoded.email);
