@@ -156,7 +156,7 @@ async function run() {
       const user = await usersCollection.findOne(query)
       //security level 3: check admin role
       const result = { admin: user?.role === 'admin' }
-      res.send(result);
+      res.send(result.admin);
     })
     //delete admin role
     app.patch("/delete/admin/:id", verifyAdmin, async (req, res) => {
