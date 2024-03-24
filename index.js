@@ -273,7 +273,7 @@ async function run() {
     })  
 
     // carts collection
-    app.get('/carts',verifyJwt, async (req, res) => {
+    app.get('/carts', async (req, res) => {
 
       const email = req.query.email;
       if (!email) {
