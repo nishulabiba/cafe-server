@@ -156,7 +156,7 @@ async function run() {
       res.send(result.admin);
     })
     //delete admin role
-    app.patch("/delete/admin/:id", verifyAdmin , async (req, res) => {
+    app.patch("/delete/admin/:id" , async (req, res) => {
       const id = req.params.id;
       const filter = { _id: new ObjectId(id) };
       const updateDoc = {
