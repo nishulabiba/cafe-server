@@ -243,7 +243,7 @@ async function run() {
     //get single menu item....
     //reviews
 
-    app.post("/reviews", verifyJwt, async (req, res) => {
+    app.post("/reviews", async (req, res) => {
 
       const item = req.body;
       const result = await reviewsCollection.insertOne(item);
