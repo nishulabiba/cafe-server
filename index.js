@@ -84,7 +84,6 @@ async function run() {
       const user = await usersCollection.findOne(query)
       //security level : check admin role
       const admin = { admin: user?.role === 'admin' }
-      console.log(admin.admin);
       if (admin.admin == false) {
         return res.status(401).send({ message: 'forbidden  access' });
       }
@@ -157,7 +156,7 @@ async function run() {
       res.send(result.admin);
     })
     //delete admin role
-    app.patch("/delete/admin/:id",verifyJwt, verifyAdmin, async (req, res) => {
+    app.patch("/delete/admin/:id",verifyJwt , verifyAdmin, async (req, res) => {
       const id = req.params.id;
       const filter = { _id: new ObjectId(id) };
       const updateDoc = {
@@ -233,7 +232,7 @@ async function run() {
     })
     // cart posted
 
-    app.post("/carts", async (req, res) => {
+    app.post("/carts", verifyJwt, async (req, res) => {
 
       const item = req.body;
       const result = await cartCollection.insertOne(item);
@@ -257,7 +256,7 @@ async function run() {
       const result = await reservationCollection.find(query).toArray();
       res.send(result);
     })
-    app.delete("/delete/booking/:id", async (req, res) => {
+    app.delete("/delete/booking/:id", verifyJwt, async (req, res) => {
       try {
        
         const id = req.params.id;
