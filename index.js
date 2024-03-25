@@ -241,6 +241,14 @@ async function run() {
     });
 
     //get single menu item....
+    //reviews
+
+    app.post("/reviews", verifyJwt, async (req, res) => {
+
+      const item = req.body;
+      const result = await reviewsCollection.insertOne(item);
+      res.send(result)
+    })
 
     app.get("/reviews", async (req, res) => {
       const result = await reviewsCollection.find().toArray();
