@@ -107,7 +107,7 @@ async function run() {
       }
     })
 
-    app.get("/users",verifyJwt, verifyAdmin, async (req, res) => {
+    app.get("/users", async (req, res) => {
       
        const email = req.query.email;
        //security level: check logged user.
