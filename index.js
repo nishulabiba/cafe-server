@@ -108,21 +108,19 @@ async function run() {
     })
 
     app.get("/users",verifyJwt, verifyAdmin, async (req, res) => {
-      // console.log(req.headers);
-      // const email = req.query.email;
-      // //security level: check logged user.
-      // if (!email) {
-      //   return res.status(401).send({ message: 'unauthorized access' });
-      // }
-      // const query = { email: email }
-      // const user = await usersCollection.findOne(query)
-      // //security level : check admin role
-      // const admin = {admin: user?.role === 'admin' }
-      // console.log(admin.admin);
-      // if(admin.admin == false){
-      //   return res.status(401).send({ message: 'forbidden  access' });
-
-      // }
+      
+       const email = req.query.email;
+       //security level: check logged user.
+       if (!email) {
+         return res.status(401).send({ message: 'unauthorized access' });
+       }
+       const query = { email: email }
+       const user = await usersCollection.findOne(query)
+       //security level : check admin role
+       const admin = {admin: user?.role === 'admin' }
+       if(!admin.admin){
+         return res.status(401).send({ message: 'forbidden  access' })
+       }
       const result = await usersCollection.find().toArray()
       res.send(result)
     })
