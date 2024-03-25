@@ -171,7 +171,7 @@ async function run() {
     )
     // delete user
     
-    app.delete("/delete/user/:id", verifyAdmin, verifyJwt, async (req, res) => {
+    app.delete("/delete/user/:id", async (req, res) => {
       try {
         const id = req.params.id;
         const filter = { _id: new ObjectId(id) }
