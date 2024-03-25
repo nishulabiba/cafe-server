@@ -269,6 +269,17 @@ async function run() {
       const result = await reservationCollection.insertOne(item);
       res.send(result)
     })
+    // get all bookings
+    app.get('/bookings', verifyJwt, async (req, res) => {
+      const email = req.query.email;
+      console.log(email);
+      if (!email) {
+        return res.status(401).send({ message: 'unauthorized access' });
+      }
+      const result = await reservationCollection.find().toArray();
+      res.send(result);
+    })
+
 
     app.get('/reservations', verifyJwt, async (req, res) => {
       const email = req.query.email;
