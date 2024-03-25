@@ -169,6 +169,22 @@ async function run() {
     }
 
     )
+    // delete user
+    
+    app.delete("/delete/user/:id", verifyAdmin, verifyJwt, async (req, res) => {
+      try {
+        const id = req.params.id;
+        const filter = { _id: new ObjectId(id) }
+
+        const result = await usersCollection.deleteOne(filter)
+        res.send(result)
+      } catch (err) {
+        res.send(err.message)
+      }
+    })
+
+
+
 
     // Food related api.......................
     app.post("/menu", async (req, res) => {
@@ -281,7 +297,7 @@ async function run() {
       const result = await cartCollection.find(query).toArray();
       res.send(result);
     });
-    app.delete('/carts/:email', async (req, res) => {
+    app.delete('/carts/:email', verifyJwt, async (req, res) => {
       try {
         const email = req.params.email;
         
