@@ -279,6 +279,32 @@ async function run() {
       const result = await reservationCollection.find().toArray();
       res.send(result);
     })
+    //confirmations for the bookings
+    app.patch("/reservation/:id", async (req, res) => {
+      const id = req.params.id;
+      const filter = { _id: new ObjectId(id) };
+      const updateDoc = {
+        $set: {
+          state: `confirmed`
+        }
+      }
+      const result = await reservationCollection.updateOne(filter, updateDoc);
+      res.send(result)
+    }
+    )
+    //Decline confirmation
+    app.patch("/reservation/decline/:id", async (req, res) => {
+      const id = req.params.id;
+      const filter = { _id: new ObjectId(id) };
+      const updateDoc = {
+        $set: {
+          state: `declined`
+        }
+      }
+      const result = await reservationCollection.updateOne(filter, updateDoc);
+      res.send(result)
+    }
+    )
 
 
     app.get('/reservations', verifyJwt, async (req, res) => {
