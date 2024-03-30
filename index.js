@@ -106,7 +106,7 @@ async function run() {
       }
     })
 
-    app.get("/users", async (req, res) => {
+    app.get("/users", verifyJwt, verifyAdmin, async (req, res) => {
       
        const email = req.query.email;
        //security level: check logged user.
@@ -125,7 +125,7 @@ async function run() {
     })
     //patch the user's role
 
-    app.patch("/users/admin/:id", async (req, res) => {
+    app.patch("/users/admin/:id", verifyJwt, verifyAdmin, async (req, res) => {
       const id = req.params.id;
       const filter = { _id: new ObjectId(id) };
       const updateDoc = {
@@ -156,7 +156,7 @@ async function run() {
       res.send(result.admin);
     })
     //delete admin role
-    app.patch("/delete/admin/:id", async (req, res) => {
+    app.patch("/delete/admin/:id", verifyJwt, verifyAdmin, async (req, res) => {
       const id = req.params.id;
       const filter = { _id: new ObjectId(id) };
       const updateDoc = {
@@ -171,7 +171,7 @@ async function run() {
     )
     // delete user
     
-    app.delete("/delete/user/:id", async (req, res) => {
+    app.delete("/delete/user/:id", verifyJwt, verifyAdmin, async (req, res) => {
       try {
         const id = req.params.id;
         const filter = { _id: new ObjectId(id) }
@@ -187,7 +187,7 @@ async function run() {
 
 
     // Food related api.......................
-    app.post("/menu", async (req, res) => {
+    app.post("/menu", verifyJwt,  verifyAdmin, async (req, res) => {
       const newItem = req.body;
       const email = req.query.email;
       //security level: check logged user.
@@ -205,7 +205,7 @@ async function run() {
       const result = await menuCollection.insertOne(newItem)
       res.send(result)
     })
-    app.delete("/delete/item/:id", async (req, res) => {
+    app.delete("/delete/item/:id", verifyJwt,  verifyAdmin, async (req, res) => {
       try {
         const id = req.params.id;
         const filter = { _id: new ObjectId(id) }
@@ -243,7 +243,7 @@ async function run() {
     //get single menu item....
     //reviews
 
-    app.post("/reviews", async (req, res) => {
+    app.post("/reviews", verifyJwt, async (req, res) => {
 
       const item = req.body;
       const result = await reviewsCollection.insertOne(item);
@@ -280,7 +280,7 @@ async function run() {
       res.send(result);
     })
     //confirmations for the bookings
-    app.patch("/reservation/:id", async (req, res) => {
+    app.patch("/reservation/:id", verifyJwt, verifyAdmin, async (req, res) => {
       const id = req.params.id;
       const filter = { _id: new ObjectId(id) };
       const updateDoc = {
@@ -293,7 +293,7 @@ async function run() {
     }
     )
     //Decline confirmation
-    app.patch("/reservation/decline/:id", async (req, res) => {
+    app.patch("/reservation/decline/:id",  verifyJwt, verifyAdmin, async (req, res) => {
       const id = req.params.id;
       const filter = { _id: new ObjectId(id) };
       const updateDoc = {
@@ -354,7 +354,7 @@ async function run() {
       }
     })
 
-    app.delete("/delete/:id", async (req, res) => {
+    app.delete("/delete/:id", verifyJwt, async (req, res) => {
       try {
         const email = req.query.email;
         if (!email) {
@@ -371,7 +371,7 @@ async function run() {
     })
 
     //payment method
-    app.post("/create-payment-intent", async (req, res) => {
+    app.post("/create-payment-intent", verifyJwt, async (req, res) => {
       try {
         const { price } = req.body;
         const amount = parseInt(parseFloat(price) * 100);
@@ -401,7 +401,7 @@ async function run() {
     }
     )
 
-    app.post('/payments', async(req, res)=>{
+    app.post('/payments', verifyJwt, async(req, res)=>{
       const payment = req.body;
       const paymentResult = await paymentCollection.insertOne(payment);
       const query = {_id: {$in: payment.items.map(id=> new ObjectId(id))} }
@@ -414,7 +414,7 @@ async function run() {
     })
 
     ///order statistics
-    app.get("/order-stats", async(req, res)=>{
+    app.get("/order-stats", verifyJwt, verifyAdmin, async(req, res)=>{
       const pipeline = [
         {
           $lookup: {
@@ -450,7 +450,7 @@ async function run() {
       res.json(result);
     })
 
-    app.get("/admin-stats", async(req, res)=>{
+    app.get("/admin-stats", verifyAdmin, verifyAdmin, async(req, res)=>{
       const email = req.query.email;
       const customers = await usersCollection.estimatedDocumentCount()
       const products = await menuCollection.estimatedDocumentCount()
