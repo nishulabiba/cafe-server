@@ -414,7 +414,8 @@ async function run() {
     })
 
     ///order statistics
-    app.get("/order-stats", async(req, res)=>{
+    app.get("/order-stats", verifyJwt, async(req, res)=>{
+
       const pipeline = [
         {
           $lookup: {
