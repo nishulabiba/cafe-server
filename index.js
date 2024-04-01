@@ -451,7 +451,7 @@ async function run() {
       res.json(result);
     })
 
-    app.get("/admin-stats", async(req, res)=>{
+    app.get("/admin-stats", verifyJwt, async(req, res)=>{
       const email = req.query.email;
       const customers = await usersCollection.estimatedDocumentCount()
       const products = await menuCollection.estimatedDocumentCount()
