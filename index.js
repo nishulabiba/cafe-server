@@ -221,14 +221,12 @@ async function run() {
       res.send(result)
     })
     app.get("/menu/:id", async (req, res) => {
-      const id = req.params.id;
-
-
       try {
+        const id = req.params.id;
         const result = await menuCollection.find().toArray()
-        const filter =  result.filter(item=> item._id === id)
-        if (result) {
-          res.send(filter[0]);
+        const filteredItem =  result.filter(item=> item._id === id)
+        if (filteredItem) {
+          res.send(filteredItem);
         } else {
           // If no document is found, send a 404 Not Found status
           res.status(404).send("Menu not found");
