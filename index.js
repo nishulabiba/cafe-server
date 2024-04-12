@@ -224,13 +224,17 @@ async function run() {
     app.patch("/menu/:id", verifyJwt, async (req, res) => {
       try {
         const id = req.params.id;
-        const filtered = {_id : id}
-        const item = req.body;
-        const result = await menuCollection.updateOne(filtered, item)
-        if (result) {
-          res.send(result);
-        } 
-        else {
+        const filtered = { _id: id }; // Filtering based on document ID
+        const update = { $set: req.body }; // Using $set operator to update the fields
+    
+        console.log({ update, filtered });
+    
+        const result = await menuCollection.updateOne(filtered, update);
+    
+        if (result.modifiedCount > 0) {
+          // If at least one document is modified, send a success response
+          res.send("Menu updated successfully");
+        } else {
           // If no document is found, send a 404 Not Found status
           res.status(404).send("Menu not found");
         }
@@ -239,7 +243,7 @@ async function run() {
         console.error(error);
         res.status(500).send("Internal Server Error");
       }
-  })
+    });
   app.get("/menu/:id", verifyJwt, async (req, res) => {
     try {
       const id = req.params.id;
