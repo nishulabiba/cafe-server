@@ -220,17 +220,30 @@ async function run() {
       const result = await menuCollection.find().toArray();
       res.send(result)
     })
-    app.get("/menu/:id", async (req, res) => {
+    // app.get("/menu/:id", verifyJwt, verifyAdmin, async (req, res) => {
+    //   try {
+    //     const id = req.params.id;
+    //     const result = await menuCollection.find().toArray()
+    //     const filteredItem =  result.filter(item=> item._id === id)
+    //     if (filteredItem) {
+    //       res.send(filteredItem);
+    //     } else {
+    //       // If no document is found, send a 404 Not Found status
+    //       res.status(404).send("Menu not found");
+    //     }
+    //   } catch (error) {
+    //     // Handle other potential errors (e.g., database connection issues)
+    //     console.error(error);
+    //     res.status(500).send("Internal Server Error");
+    //   }
+    // });
+    app.get("/menu/:id", verifyJwt, verifyAdmin, async (req, res) => {
       try {
         const id = req.params.id;
-        const result = await menuCollection.find().toArray()
-        const filteredItem =  result.filter(item=> item._id === id)
-        if (filteredItem) {
-          res.send(filteredItem);
-        } else {
-          // If no document is found, send a 404 Not Found status
-          res.status(404).send("Menu not found");
-        }
+      const filter = { _id: new ObjectId(id) };
+      const result = await menuCollection.findOne(filter)
+      res.send(result)
+
       } catch (error) {
         // Handle other potential errors (e.g., database connection issues)
         console.error(error);
