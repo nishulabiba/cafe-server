@@ -237,7 +237,7 @@ async function run() {
     //     res.status(500).send("Internal Server Error");
     //   }
     // });
-    app.get("/menu/:id", verifyJwt, verifyAdmin, async (req, res) => {
+    app.get("/menu/:id", verifyJwt, async (req, res) => {
       try {
         const id = req.params.id;
       const filter = { _id: new ObjectId(id) };
