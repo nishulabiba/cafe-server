@@ -224,12 +224,13 @@ async function run() {
     app.patch("/menu/:id", verifyJwt, async (req, res) => {
       try {
         const id = req.params.id;
-        const filtered = {_id : new ObjectId(id)}
+        const filtered = {_id : id}
         const item = req.body;
         const result = await menuCollection.updateOne(filtered, item)
         if (result) {
           res.send(result);
-        } else {
+        } 
+        else {
           // If no document is found, send a 404 Not Found status
           res.status(404).send("Menu not found");
         }
