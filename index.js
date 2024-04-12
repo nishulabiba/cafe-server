@@ -225,10 +225,7 @@ async function run() {
       try {
         const id = req.params.id;
         const filtered = { _id: id }; // Filtering based on document ID
-        const update = { $set: req.body }; // Using $set operator to update the fields
-    
-        console.log({ update, filtered });
-    
+        const update = { $set: req.body }; // Using $set operator to update the fields    
         const result = await menuCollection.updateOne(filtered, update);
     
         if (result.modifiedCount > 0) {
