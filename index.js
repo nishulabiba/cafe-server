@@ -240,7 +240,7 @@ async function run() {
     app.get("/menu/:id", verifyJwt, async (req, res) => {
       try {
         const id = req.params.id;
-      const filter = { _id: new ObjectId(id) };
+      const filter = { _id: id };
       const result = await menuCollection.findOne(filter)
       res.send(result)
 
