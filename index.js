@@ -233,7 +233,7 @@ async function run() {
     
         if (result.modifiedCount > 0) {
           // If at least one document is modified, send a success response
-          res.send("Menu updated successfully");
+          res.send(result);
         } else {
           // If no document is found, send a 404 Not Found status
           res.status(404).send("Menu not found");
