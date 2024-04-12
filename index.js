@@ -221,7 +221,7 @@ async function run() {
       res.send(result)
     })
 
-    app.patch("/menu/:id", verifyJwt, verifyAdmin, async (req, res) => {
+    app.patch("/menu/:id", verifyJwt, async (req, res) => {
       try {
         const id = req.params.id;
         const filtered = {_id : new ObjectId(id)}
