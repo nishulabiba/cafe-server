@@ -62,7 +62,7 @@ async function run() {
     const cartCollection = client.db("cafedb").collection("carts");
     const paymentCollection = client.db("cafedb").collection("payments");
     const reservationCollection = client.db("cafedb").collection("reservations");
-    
+
 
     //JWT GENERATION...
     app.post("/jwt", (req, res) => {
@@ -107,19 +107,19 @@ async function run() {
     })
 
     app.get("/users", verifyJwt, verifyAdmin, async (req, res) => {
-      
-       const email = req.query.email;
-       //security level: check logged user.
-       if (!email) {
-         return res.status(401).send({ message: 'unauthorized access' });
-       }
-       const query = { email: email }
-       const user = await usersCollection.findOne(query)
-       //security level : check admin role
-       const admin = {admin: user?.role === 'admin' }
-       if(!admin.admin){
-         return res.status(401).send({ message: 'forbidden  access' })
-       }
+
+      const email = req.query.email;
+      //security level: check logged user.
+      if (!email) {
+        return res.status(401).send({ message: 'unauthorized access' });
+      }
+      const query = { email: email }
+      const user = await usersCollection.findOne(query)
+      //security level : check admin role
+      const admin = { admin: user?.role === 'admin' }
+      if (!admin.admin) {
+        return res.status(401).send({ message: 'forbidden  access' })
+      }
       const result = await usersCollection.find().toArray()
       res.send(result)
     })
@@ -170,7 +170,7 @@ async function run() {
 
     )
     // delete user
-    
+
     app.delete("/delete/user/:id", verifyJwt, verifyAdmin, async (req, res) => {
       try {
         const id = req.params.id;
@@ -187,7 +187,7 @@ async function run() {
 
 
     // Food related api.......................
-    app.post("/menu", verifyJwt,  verifyAdmin, async (req, res) => {
+    app.post("/menu", verifyJwt, verifyAdmin, async (req, res) => {
       const newItem = req.body;
       const email = req.query.email;
       //security level: check logged user.
@@ -205,7 +205,7 @@ async function run() {
       const result = await menuCollection.insertOne(newItem)
       res.send(result)
     })
-    app.delete("/delete/item/:id", verifyJwt,  verifyAdmin, async (req, res) => {
+    app.delete("/delete/item/:id", verifyJwt, verifyAdmin, async (req, res) => {
       try {
         const id = req.params.id;
         const filter = { _id: new ObjectId(id) }
@@ -220,272 +220,271 @@ async function run() {
       const result = await menuCollection.find().toArray();
       res.send(result)
     })
-    // app.get("/menu/:id", verifyJwt, verifyAdmin, async (req, res) => {
-    //   try {
-    //     const id = req.params.id;
-    //     const result = await menuCollection.find().toArray()
-    //     const filteredItem =  result.filter(item=> item._id === id)
-    //     if (filteredItem) {
-    //       res.send(filteredItem);
-    //     } else {
-    //       // If no document is found, send a 404 Not Found status
-    //       res.status(404).send("Menu not found");
-    //     }
-    //   } catch (error) {
-    //     // Handle other potential errors (e.g., database connection issues)
-    //     console.error(error);
-    //     res.status(500).send("Internal Server Error");
-    //   }
-    // });
-    app.get("/menu/:id", verifyJwt, async (req, res) => {
+
+    app.patch("/menu/:id", verifyJwt, verifyAdmin, async (req, res) => {
       try {
         const id = req.params.id;
-      if(id)
-      {
-        const filter = { _id: id };
-        const result = await menuCollection.findOne(filter)
-        res.send(result)
-      }
-      
-
+        const filtered = {_id : new ObjectId(id)}
+        const item = req.body;
+        const result = await menuCollection.updateOne(filtered, item)
+        if (result) {
+          res.send(result);
+        } else {
+          // If no document is found, send a 404 Not Found status
+          res.status(404).send("Menu not found");
+        }
       } catch (error) {
         // Handle other potential errors (e.g., database connection issues)
         console.error(error);
         res.status(500).send("Internal Server Error");
       }
-    });
-
-    //get single menu item....
-    //reviews
-
-    app.post("/reviews", verifyJwt, async (req, res) => {
-
-      const item = req.body;
-      const result = await reviewsCollection.insertOne(item);
-      res.send(result)
-    })
-
-    app.get("/reviews", async (req, res) => {
-      const result = await reviewsCollection.find().toArray();
-      res.send(result)
-    })
-    // cart posted
-
-    app.post("/carts", verifyJwt, async (req, res) => {
-
-      const item = req.body;
-      const result = await cartCollection.insertOne(item);
-      res.send(result)
-    })
-    // reservations collection
-    app.post("/reservations", verifyJwt, async (req, res) => {
-
-      const item = req.body;
-      const result = await reservationCollection.insertOne(item);
-      res.send(result)
-    })
-    // get all bookings
-    app.get('/bookings', verifyJwt, async (req, res) => {
-      const email = req.query.email;
-      console.log(email);
-      if (!email) {
-        return res.status(401).send({ message: 'unauthorized access' });
-      }
-      const result = await reservationCollection.find().toArray();
-      res.send(result);
-    })
-    //confirmations for the bookings
-    app.patch("/reservation/:id", verifyJwt, verifyAdmin, async (req, res) => {
+  })
+  app.get("/menu/:id", verifyJwt, async (req, res) => {
+    try {
       const id = req.params.id;
-      const filter = { _id: new ObjectId(id) };
-      const updateDoc = {
-        $set: {
-          state: `confirmed`
-        }
-      }
-      const result = await reservationCollection.updateOne(filter, updateDoc);
-      res.send(result)
+      if (id) {
+        const filter = { _id: id };
+        const result = await menuCollection.findOne(filter)
+        res.send(result)
+      } }
+       catch (error) {
+      // Handle other potential errors (e.g., database connection issues)
+      console.error(error);
+      res.status(500).send("Internal Server Error");
     }
-    )
-    //Decline confirmation
-    app.patch("/reservation/decline/:id",  verifyJwt, verifyAdmin, async (req, res) => {
+  });
+
+  //get single menu item....
+  //reviews
+
+  app.post("/reviews", verifyJwt, async (req, res) => {
+
+    const item = req.body;
+    const result = await reviewsCollection.insertOne(item);
+    res.send(result)
+  })
+
+  app.get("/reviews", async (req, res) => {
+    const result = await reviewsCollection.find().toArray();
+    res.send(result)
+  })
+  // cart posted
+
+  app.post("/carts", verifyJwt, async (req, res) => {
+
+    const item = req.body;
+    const result = await cartCollection.insertOne(item);
+    res.send(result)
+  })
+  // reservations collection
+  app.post("/reservations", verifyJwt, async (req, res) => {
+
+    const item = req.body;
+    const result = await reservationCollection.insertOne(item);
+    res.send(result)
+  })
+  // get all bookings
+  app.get('/bookings', verifyJwt, async (req, res) => {
+    const email = req.query.email;
+    console.log(email);
+    if (!email) {
+      return res.status(401).send({ message: 'unauthorized access' });
+    }
+    const result = await reservationCollection.find().toArray();
+    res.send(result);
+  })
+  //confirmations for the bookings
+  app.patch("/reservation/:id", verifyJwt, verifyAdmin, async (req, res) => {
+    const id = req.params.id;
+    const filter = { _id: new ObjectId(id) };
+    const updateDoc = {
+      $set: {
+        state: `confirmed`
+      }
+    }
+    const result = await reservationCollection.updateOne(filter, updateDoc);
+    res.send(result)
+  }
+  )
+  //Decline confirmation
+  app.patch("/reservation/decline/:id", verifyJwt, verifyAdmin, async (req, res) => {
+    const id = req.params.id;
+    const filter = { _id: new ObjectId(id) };
+    const updateDoc = {
+      $set: {
+        state: `declined`
+      }
+    }
+    const result = await reservationCollection.updateOne(filter, updateDoc);
+    res.send(result)
+  }
+  )
+
+
+  app.get('/reservations', verifyJwt, async (req, res) => {
+    const email = req.query.email;
+    console.log(email);
+    if (!email) {
+      return res.status(401).send({ message: 'unauthorized access' });
+    }
+    const query = { email: email };
+    const result = await reservationCollection.find(query).toArray();
+    res.send(result);
+  })
+  app.delete("/delete/booking/:id", verifyJwt, async (req, res) => {
+    try {
+
       const id = req.params.id;
-      const filter = { _id: new ObjectId(id) };
-      const updateDoc = {
-        $set: {
-          state: `declined`
-        }
-      }
-      const result = await reservationCollection.updateOne(filter, updateDoc);
+      const filter = { _id: new ObjectId(id) }
+
+      const result = await reservationCollection.deleteOne(filter)
       res.send(result)
+    } catch (err) {
+      res.send(err.message)
     }
-    )
+  })
+
+  // carts collection
+  app.get('/carts', async (req, res) => {
+
+    const email = req.query.email;
+    if (!email) {
+      return res.status(401).send({ message: 'unauthorized access' });
+    }
+
+    const query = { email: email };
+    const result = await cartCollection.find(query).toArray();
+    res.send(result);
+  });
+  app.delete('/carts/:email', verifyJwt, async (req, res) => {
+    try {
+      const email = req.params.email;
 
 
-    app.get('/reservations', verifyJwt, async (req, res) => {
+      const result = await cartCollection.deleteMany({ email: email })
+      res.send(result)
+    } catch (err) {
+      res.send(err.message)
+    }
+  })
+
+  app.delete("/delete/:id", verifyJwt, async (req, res) => {
+    try {
       const email = req.query.email;
-      console.log(email);
       if (!email) {
         return res.status(401).send({ message: 'unauthorized access' });
       }
-      const query = { email: email };
-      const result = await reservationCollection.find(query).toArray();
-      res.send(result);
-    })
-    app.delete("/delete/booking/:id", verifyJwt, async (req, res) => {
-      try {
-       
-        const id = req.params.id;
-        const filter = { _id: new ObjectId(id) }
+      const id = req.params.id;
+      const filter = { _id: new ObjectId(id) }
 
-        const result = await reservationCollection.deleteOne(filter)
-        res.send(result)
-      } catch (err) {
-        res.send(err.message)
-      }
-    })  
+      const result = await cartCollection.deleteOne(filter)
+      res.send(result)
+    } catch (err) {
+      res.send(err.message)
+    }
+  })
 
-    // carts collection
-    app.get('/carts', async (req, res) => {
-
-      const email = req.query.email;
-      if (!email) {
-        return res.status(401).send({ message: 'unauthorized access' });
-      }
-      
-      const query = { email: email };
-      const result = await cartCollection.find(query).toArray();
-      res.send(result);
-    });
-    app.delete('/carts/:email', verifyJwt, async (req, res) => {
-      try {
-        const email = req.params.email;
-        
-
-        const result = await cartCollection.deleteMany({email: email})
-        res.send(result)
-      } catch (err) {
-        res.send(err.message)
-      }
-    })
-
-    app.delete("/delete/:id", verifyJwt, async (req, res) => {
-      try {
-        const email = req.query.email;
-        if (!email) {
-          return res.status(401).send({ message: 'unauthorized access' });
-        }
-        const id = req.params.id;
-        const filter = { _id: new ObjectId(id) }
-
-        const result = await cartCollection.deleteOne(filter)
-        res.send(result)
-      } catch (err) {
-        res.send(err.message)
-      }
-    })
-
-    //payment method
-    app.post("/create-payment-intent", verifyJwt, async (req, res) => {
-      try {
-        const { price } = req.body;
-        const amount = parseInt(parseFloat(price) * 100);
+  //payment method
+  app.post("/create-payment-intent", verifyJwt, async (req, res) => {
+    try {
+      const { price } = req.body;
+      const amount = parseInt(parseFloat(price) * 100);
 
 
 
-        // Create a PaymentIntent with the order amount and currency
-        const paymentIntent = await stripe.paymentIntents.create({
-          amount: amount,
-          currency: 'usd',
-          payment_method_types: ['card'],
-        })
-          .then(async (paymentIntent) => {
-            const secret = await paymentIntent.client_secret
+      // Create a PaymentIntent with the order amount and currency
+      const paymentIntent = await stripe.paymentIntents.create({
+        amount: amount,
+        currency: 'usd',
+        payment_method_types: ['card'],
+      })
+        .then(async (paymentIntent) => {
+          const secret = await paymentIntent.client_secret
 
-            res.send({
-              clientSecret: secret
-            });
-          })
-          .catch(error => {
-            console.error(error);
+          res.send({
+            clientSecret: secret
           });
-      }
-      catch (error) {
-        console.log(error);
-      }
+        })
+        .catch(error => {
+          console.error(error);
+        });
     }
-    )
-
-    app.post('/payments', verifyJwt, async(req, res)=>{
-      const payment = req.body;
-      const paymentResult = await paymentCollection.insertOne(payment);
-      const query = {_id: {$in: payment.items.map(id=> new ObjectId(id))} }
-      const deleteResult = await cartCollection.deleteMany(query)
-      res.send({paymentResult, deleteResult})
-    })
-    app.get("/payments", verifyJwt, async(req, res)=>{
-      const result = await paymentCollection.find().toArray();
-      res.send(result)
-    })
-
-    ///order statistics
-    app.get("/order-stats", verifyJwt, async(req, res)=>{
-
-      const pipeline = [
-        {
-          $lookup: {
-            from: 'menu',
-            localField: 'items',
-            foreignField: '_id',
-            as: 'menuItemData'
-          }
-        },
-        {
-          $unwind: '$menuItemData' // Unwind the menuItemData array
-        },
-        {
-          $group: {
-            _id: '$menuItemData.category',
-            quantity: { $sum: 1 }, // Sum up the quantity field
-            total: { $sum: '$menuItemData.price' } // Calculate total price for each category
-          }
-        },
-        
-  {
-    $project: {
-      category: "$_id", // Rename _id to category
-      total: { $round: ["$total", 2] }, // Round total to 2 decimal places
-      quantity: 1, // Include totalQuantity
-      _id: 0 // Exclude _id field
+    catch (error) {
+      console.log(error);
     }
   }
-      ];
-      const result = await paymentCollection.aggregate(pipeline).toArray();
+  )
 
-      console.log(result);
-      res.json(result);
-    })
+  app.post('/payments', verifyJwt, async (req, res) => {
+    const payment = req.body;
+    const paymentResult = await paymentCollection.insertOne(payment);
+    const query = { _id: { $in: payment.items.map(id => new ObjectId(id)) } }
+    const deleteResult = await cartCollection.deleteMany(query)
+    res.send({ paymentResult, deleteResult })
+  })
+  app.get("/payments", verifyJwt, async (req, res) => {
+    const result = await paymentCollection.find().toArray();
+    res.send(result)
+  })
 
-    app.get("/admin-stats", verifyJwt, verifyAdmin, async(req, res)=>{
-      const email = req.query.email;
-      const customers = await usersCollection.estimatedDocumentCount()
-      const products = await menuCollection.estimatedDocumentCount()
-      const orders = await paymentCollection.estimatedDocumentCount()
-      // revenue
-      const payments = await paymentCollection.find().toArray();
-      const revenue = payments.reduce((sum, payment)=> sum+payment.price, 0)
-      res.send({revenue, customers, orders, products})
-    })
-    
+  ///order statistics
+  app.get("/order-stats", verifyJwt, async (req, res) => {
+
+    const pipeline = [
+      {
+        $lookup: {
+          from: 'menu',
+          localField: 'items',
+          foreignField: '_id',
+          as: 'menuItemData'
+        }
+      },
+      {
+        $unwind: '$menuItemData' // Unwind the menuItemData array
+      },
+      {
+        $group: {
+          _id: '$menuItemData.category',
+          quantity: { $sum: 1 }, // Sum up the quantity field
+          total: { $sum: '$menuItemData.price' } // Calculate total price for each category
+        }
+      },
+
+      {
+        $project: {
+          category: "$_id", // Rename _id to category
+          total: { $round: ["$total", 2] }, // Round total to 2 decimal places
+          quantity: 1, // Include totalQuantity
+          _id: 0 // Exclude _id field
+        }
+      }
+    ];
+    const result = await paymentCollection.aggregate(pipeline).toArray();
+
+    console.log(result);
+    res.json(result);
+  })
+
+  app.get("/admin-stats", verifyJwt, verifyAdmin, async (req, res) => {
+    const email = req.query.email;
+    const customers = await usersCollection.estimatedDocumentCount()
+    const products = await menuCollection.estimatedDocumentCount()
+    const orders = await paymentCollection.estimatedDocumentCount()
+    // revenue
+    const payments = await paymentCollection.find().toArray();
+    const revenue = payments.reduce((sum, payment) => sum + payment.price, 0)
+    res.send({ revenue, customers, orders, products })
+  })
 
 
-    // Connect the client to the server	(optional starting in v4.7)
-    await client.connect();
-    // Send a ping to confirm a successful connection
-    await client.db("admin").command({ ping: 1 });
-    console.log("Pinged your deployment. You successfully connected to MongoDB!");
-  } finally {
-  }
+
+  // Connect the client to the server	(optional starting in v4.7)
+  await client.connect();
+  // Send a ping to confirm a successful connection
+  await client.db("admin").command({ ping: 1 });
+  console.log("Pinged your deployment. You successfully connected to MongoDB!");
+} finally {
+}
 }
 run().catch(console.dir);
 
